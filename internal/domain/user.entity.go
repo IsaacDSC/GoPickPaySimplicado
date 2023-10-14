@@ -1,6 +1,9 @@
 package domain
 
-import "github.com/google/uuid"
+import (
+	"github.com/IsaacDSC/GoPickPaySimplicado/external/sqlc"
+	"github.com/google/uuid"
+)
 
 const storekeeper = "STOREKEEPER"
 const consumer = "consumer"
@@ -17,4 +20,12 @@ func NewUserEntity() *UserEntity {
 	return new(UserEntity)
 }
 
-func (*UserEntity) ToDomain() {}
+func (*UserEntity) ToDomain(input sqlc.User) UserEntity {
+	return UserEntity{
+		ID:           input.ID,
+		CompleteName: input.CompleteName.String,
+		Cpf_cnpj:     input.CpfCnpj,
+		TypeUser:     input.TypeUser,
+		Email:        input.Email,
+	}
+}
