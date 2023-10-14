@@ -1,0 +1,11 @@
+version: "2"
+sql:
+  - engine: "postgresql"
+    queries: 
+      - "external/sqlc/queries/transaction.queries.sql"
+      - "external/sqlc/queries/user.queries.sql"
+    schema: "external/sqlc/schema/schema.sql"
+    gen:
+      go:
+        package: "sqlc"
+        out: "./external/sqlc"
