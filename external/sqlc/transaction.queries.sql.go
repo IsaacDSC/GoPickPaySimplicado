@@ -39,23 +39,31 @@ func (q *Queries) CreateTransaction(ctx context.Context, arg CreateTransactionPa
 }
 
 const getTransactionByUserID = `-- name: GetTransactionByUserID :many
-SELECT
-  id, user_id, value, operation, status, created_at, updated_at
-FROM
-  "transaction"
-WHERE
-  user_id = $1
+SELECT transaction.id, transaction.user_id, transaction.value, transaction.operation, transaction.status, transaction.created_at, transaction.updated_at.*, "user".type_user 
+FROM "transaction" join "user" on "transaction".user_id = "user".id
+WHERE "user".id = $1
 `
 
-func (q *Queries) GetTransactionByUserID(ctx context.Context, userID uuid.UUID) ([]Transaction, error) {
-	rows, err := q.db.QueryContext(ctx, getTransactionByUserID, userID)
+type GetTransactionByUserIDRow struct {
+	ID        uuid.UUID
+	UserID    uuid.UUID
+	Value     string
+	Operation sql.NullString
+	Status    string
+	CreatedAt sql.NullTime
+	UpdatedAt sql.NullTime
+	TypeUser  string
+}
+
+func (q *Queries) GetTransactionByUserID(ctx context.Context, id uuid.UUID) ([]GetTransactionByUserIDRow, error) {
+	rows, err := q.db.QueryContext(ctx, getTransactionByUserID, id)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Transaction
+	var items []GetTransactionByUserIDRow
 	for rows.Next() {
-		var i Transaction
+		var i GetTransactionByUserIDRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.UserID,
@@ -64,6 +72,7 @@ func (q *Queries) GetTransactionByUserID(ctx context.Context, userID uuid.UUID) 
 			&i.Status,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.TypeUser,
 		); err != nil {
 			return nil, err
 		}

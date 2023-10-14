@@ -1,10 +1,7 @@
 -- name: GetTransactionByUserID :many
-SELECT
-  *
-FROM
-  "transaction"
-WHERE
-  user_id = $1;
+SELECT "transaction".*, "user".type_user 
+FROM "transaction" join "user" on "transaction".user_id = "user".id
+WHERE "user".id = $1;
 
 -- name: CreateTransaction :exec
 INSERT INTO
