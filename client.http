@@ -1,0 +1,31 @@
+###
+GET http://localhost:3000/
+
+
+###
+GET http://localhost:3000/transaction
+
+
+###
+POST http://localhost:3000/api/v1/transaction
+Content-Type: application/json
+
+{
+    "value" : 1000.00,
+    "senderId" : "c3abbad3-e790-4665-8798-174dff7e05f2",
+    "receiverId" : "395e1635-2f97-417b-a67f-50a2ce032ff1"
+}
+
+
+### VALIDATE TRANSACTION
+GET https://run.mocky.io/v3/69efe5ad-5221-40dd-a11f-3b24e64fbcb8
+Content-Type: application/json
+
+
+### SEND MAILER
+POST https://run.mocky.io/v3/0f35cc7d-833a-410c-ba07-7a0500fb9a2b
+Content-Type: application/json
+
+{
+    "email": "email@email.com"
+}
