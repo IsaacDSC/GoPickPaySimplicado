@@ -4,17 +4,19 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/IsaacDSC/GoPickPaySimplicado/external/sqlc"
 	"github.com/google/uuid"
 )
 
-var status = map[string][]string{
-	"status": []string{"CREATED", "NOT_AUTHORIZED", "AWAIT_PERMISSION", "DELIVERY", "NOTIFICATION", "COMPLETE"},
-}
+// var status = map[string][]string{
+// 	"status": []string{"CREATED", "NOT_AUTHORIZED", "AWAIT_PERMISSION", "DELIVERY", "NOTIFICATION", "COMPLETE"},
+// }
 
 type TransactionEntity struct {
 	ID              uuid.UUID
+	UserID          uuid.UUID
 	TypeUser        string
-	TotalBalancer   string
+	totalBalancer   string
 	Status          string
 	Value           string //TODO: implement BIG_FLOAT
 	Operation       string
@@ -24,6 +26,17 @@ type TransactionEntity struct {
 
 func NewTransactionEntity() *TransactionEntity {
 	return new(TransactionEntity)
+}
+
+func (te *TransactionEntity) ToDomain(input sqlc.GetTransactionByUserIDRow) TransactionEntity {
+	return TransactionEntity{
+		ID:        input.ID,
+		TypeUser:  input.TypeUser,
+		Status:    input.Status,
+		Value:     input.Value,
+		UserID:    input.UserID,
+		Operation: input.Operation.String,
+	}
 }
 
 func (te *TransactionEntity) TransactionFactory(
@@ -48,7 +61,7 @@ func (te *TransactionEntity) Transaction() (list_errors []string) {
 			te.Status = "NOT_AUTHORIZED"
 			return
 		}
-		te.TotalBalancer = te.aggregateWallet.totalBalancer
+		te.totalBalancer = te.aggregateWallet.totalBalancer
 		te.validateOperationDebit()
 	}
 	list_errors = te.list_errors
@@ -80,7 +93,7 @@ func (te *TransactionEntity) validateOperationDebit() {
 		te.Status = "NOT-AUTHORIZED"
 		return
 	}
-	totalBalancer, err := strconv.ParseFloat(te.TotalBalancer, 64)
+	totalBalancer, err := strconv.ParseFloat(te.totalBalancer, 64)
 	if err != nil {
 		te.list_errors = append(te.list_errors, "Error-Parse-StringToFloat")
 		te.Status = "NOT-AUTHORIZED"
