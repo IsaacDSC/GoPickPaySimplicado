@@ -4,10 +4,10 @@ import (
 	"context"
 
 	"github.com/IsaacDSC/GoPickPaySimplicado/internal/domain"
-	"github.com/gofrs/uuid"
+	"github.com/google/uuid"
 )
 
 type TransactionRepositoriesInterface interface {
-	GetTransactionsByUserID(ctx context.Context, UserID uuid.UUID) (output []domain.TransactionEntity, err error)
+	GetTransactionsByUserID(ctx context.Context, UserID uuid.UUID) (output []domain.Transactions, err error)
 	InsertTransaction(ctx context.Context, input domain.TransactionEntity) (err error)
 }

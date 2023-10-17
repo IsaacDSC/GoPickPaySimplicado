@@ -4,9 +4,11 @@ import (
 	"context"
 
 	"github.com/IsaacDSC/GoPickPaySimplicado/internal/domain"
-	"github.com/gofrs/uuid"
+	"github.com/google/uuid"
 )
 
 type UserRepositoryInterface interface {
-	GetUserByID(ctx context.Context, userID uuid.UUID) (output domain.UserEntity, err error)
+	GetUserByID(
+		ctx context.Context, userID uuid.UUID,
+	) (output domain.UserEntity, err error)
 }
