@@ -12,9 +12,13 @@ import (
 
 type TransactionRepositories struct{}
 
+func NewTransactionRepositories() *TransactionRepositories {
+	return new(TransactionRepositories)
+}
+
 func (*TransactionRepositories) GetTransactionsByUserID(
 	ctx context.Context, UserID uuid.UUID,
-) (output []domain.TransactionEntity, err error) {
+) (output []domain.Transactions, err error) {
 	conn := database.DbConn()
 	db := sqlc.New(conn)
 	transactions, err := db.GetTransactionByUserID(ctx, UserID)
@@ -22,7 +26,13 @@ func (*TransactionRepositories) GetTransactionsByUserID(
 		return
 	}
 	for index := range transactions {
-		out := domain.NewTransactionEntity().ToDomain(transactions[index])
+		out := domain.Transactions{
+			ID:        transactions[index].ID,
+			TypeUser:  transactions[index].TypeUser,
+			Status:    transactions[index].Status,
+			Value:     transactions[index].Value,
+			Operation: transactions[index].Operation.String,
+		}
 		output = append(output, out)
 	}
 	return
