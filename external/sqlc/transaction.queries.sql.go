@@ -39,7 +39,7 @@ func (q *Queries) CreateTransaction(ctx context.Context, arg CreateTransactionPa
 }
 
 const getTransactionByUserID = `-- name: GetTransactionByUserID :many
-SELECT transaction.id, transaction.user_id, transaction.value, transaction.operation, transaction.status, transaction.created_at, transaction.updated_at.*, "user".type_user 
+SELECT transaction.id, transaction.user_id, transaction.value, transaction.operation, transaction.status, transaction.created_at, transaction.updated_at, "user".type_user 
 FROM "transaction" join "user" on "transaction".user_id = "user".id
 WHERE "user".id = $1
 `
