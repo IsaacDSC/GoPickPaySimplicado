@@ -9,6 +9,7 @@ import (
 )
 
 func TestTransactionDomain(t *testing.T) {
+	userID := uuid.New()
 	t.Run("Given wallet bigger than value transfer", func(t *testing.T) {
 		t.Run("When execute at transaction with status AWAIT_PERMISSION", func(t *testing.T) {
 			t.Run("Then not Return Error", func(t *testing.T) {
@@ -41,7 +42,7 @@ func TestTransactionDomain(t *testing.T) {
 				}
 
 				entity.TransactionFactory(
-					"CONSUMER", "10000", true, transactions,
+					userID, "CONSUMER", "10000", true, transactions,
 				)
 				listErrors := entity.Transaction()
 				assert.Len(t, listErrors, 1)
@@ -79,7 +80,7 @@ func TestTransactionDomain(t *testing.T) {
 					},
 				}
 				entity.TransactionFactory(
-					"CONSUMER", "10000", true, transactions,
+					userID, "CONSUMER", "10000", true, transactions,
 				)
 				listErrors := entity.Transaction()
 				assert.Len(t, listErrors, 0)
@@ -113,7 +114,7 @@ func TestTransactionDomain(t *testing.T) {
 					},
 				}
 				entity.TransactionFactory(
-					"CONSUMER", "20000", true, transactions,
+					userID, "CONSUMER", "20000", true, transactions,
 				)
 				listErrors := entity.Transaction()
 				assert.Len(t, listErrors, 1)

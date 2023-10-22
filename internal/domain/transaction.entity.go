@@ -44,11 +44,14 @@ func (te *TransactionEntity) ToDomain(input sqlc.GetTransactionByUserIDRow) Tran
 }
 
 func (te *TransactionEntity) TransactionFactory(
+	userID uuid.UUID,
 	typeUser string,
 	value string,
 	isPayer bool,
 	transactions []Transactions,
 ) {
+	te.ID = uuid.New()
+	te.UserID = userID
 	if isPayer {
 		te.Operation = "DEBIT"
 	} else {
@@ -58,6 +61,17 @@ func (te *TransactionEntity) TransactionFactory(
 	te.Status = "CREATED"
 	te.Value = value
 	te.transactions = transactions
+}
+
+func (te *TransactionEntity) Get() TransactionEntity {
+	return TransactionEntity{
+		ID:        te.ID,
+		UserID:    te.UserID,
+		TypeUser:  te.TypeUser,
+		Status:    te.Status,
+		Value:     te.Value,
+		Operation: te.Operation,
+	}
 }
 
 func (te *TransactionEntity) Transaction() (list_errors []error) {
