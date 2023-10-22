@@ -11,9 +11,20 @@ POST http://localhost:3000/api/v1/transaction
 Content-Type: application/json
 
 {
-    "value" : 1000.00,
-    "senderId" : "c3abbad3-e790-4665-8798-174dff7e05f2",
-    "receiverId" : "395e1635-2f97-417b-a67f-50a2ce032ff1"
+    "value" : "100000",
+    "payerId" : "fb3399b7-cc9c-4265-89fc-57a299995849",
+    "payeeId" : "f46b0ee5-cd76-4267-bf71-cd50ec0d78a7"
+}
+
+###
+POST http://localhost:3000/api/v1/transaction
+Content-Type: application/json
+
+{
+    "value" : "500000",
+    "payerId" : "fb3399b7-cc9c-4265-89fc-57a299995849",
+    "payeeId" : "f46b0ee5-cd76-4267-bf71-cd50ec0d78a7",
+    "sleep": 1000
 }
 
 
