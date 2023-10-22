@@ -1,4 +1,5 @@
 package contracts
 
-// TODO: IMPLEMENTAR
-type OperationTransactionGatewayInterface interface{}
+type OperationTransactionGatewayInterface interface {
+	TransactionAuth() string
+}

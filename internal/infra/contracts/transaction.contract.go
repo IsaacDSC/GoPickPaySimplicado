@@ -10,4 +10,7 @@ import (
 type TransactionRepositoriesInterface interface {
 	GetTransactionsByUserID(ctx context.Context, UserID uuid.UUID) (output []domain.Transactions, err error)
 	InsertTransaction(ctx context.Context, input domain.TransactionEntity) (err error)
+	UpdateStatusTransaction(ctx context.Context, transactionID uuid.UUID, status string) (err error)
+	Done()
+	Rollback()
 }
