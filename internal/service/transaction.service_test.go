@@ -19,6 +19,7 @@ func TestTransactionService(t *testing.T) {
 				ctl := gomock.NewController(t)
 				defer ctl.Finish()
 				userRepository := mocks.NewMockUserRepositoryInterface(ctl)
+				transactionAuthGateway := mocks.NewMockOperationTransactionGatewayInterface(ctl)
 				userID := uuid.New()
 				userRepository.EXPECT().GetUserByID(gomock.Any(), gomock.Any()).Return(
 					domain.UserEntity{
@@ -51,7 +52,7 @@ func TestTransactionService(t *testing.T) {
 				transactionRepository.EXPECT().InsertTransaction(gomock.Any(), gomock.Any()).Return(nil)
 				service := NewTransactionService(
 					userRepository, transactionRepository,
-					mocks.NewMockOperationTransactionGatewayInterface,
+					transactionAuthGateway,
 					mocks.NewMockNotificationMailerInterface,
 					domain.NewTransactionEntity(domain.NewWalletEntity()),
 					domain.NewTransactionEntity(domain.NewWalletEntity()),
@@ -74,6 +75,7 @@ func TestTransactionService(t *testing.T) {
 				ctl := gomock.NewController(t)
 				defer ctl.Finish()
 				userRepository := mocks.NewMockUserRepositoryInterface(ctl)
+				transactionAuthGateway := mocks.NewMockOperationTransactionGatewayInterface(ctl)
 				userID := uuid.New()
 				userRepository.EXPECT().GetUserByID(gomock.Any(), gomock.Any()).Return(
 					domain.UserEntity{
@@ -106,7 +108,7 @@ func TestTransactionService(t *testing.T) {
 				transactionRepository.EXPECT().InsertTransaction(gomock.Any(), gomock.Any()).Return(nil)
 				service := NewTransactionService(
 					userRepository, transactionRepository,
-					mocks.NewMockOperationTransactionGatewayInterface,
+					transactionAuthGateway,
 					mocks.NewMockNotificationMailerInterface,
 					domain.NewTransactionEntity(domain.NewWalletEntity()),
 					domain.NewTransactionEntity(domain.NewWalletEntity()),

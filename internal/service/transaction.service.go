@@ -3,15 +3,12 @@ package service
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/IsaacDSC/GoPickPaySimplicado/internal/domain"
 	"github.com/IsaacDSC/GoPickPaySimplicado/internal/infra/contracts"
 	"github.com/IsaacDSC/GoPickPaySimplicado/internal/shared/dto"
 )
-
-type TransactionServiceInterface interface {
-	Transfer() []error
-}
 
 type TransactionService struct {
 	userRepo         contracts.UserRepositoryInterface
@@ -43,21 +40,32 @@ func NewTransactionService(
 }
 
 func (ts *TransactionService) Transfer(ctx context.Context, input dto.TransactionDtoInput) (list_errors []error) {
+	defer ts.transactionRepo.Rollback()
 	ts.input = input
 	list_errors = ts.executeTransactionPayee(ctx)
 	if len(list_errors) != 0 {
-		fmt.Println("primeiro error")
 		return
 	}
 	list_errors = ts.executeTransactionPayer(ctx)
 	if len(list_errors) != 0 {
-		fmt.Println("segundo error")
 		return
 	}
+	status := ts.checkOperation.TransactionAuth()
+	fmt.Println("status", status)
+	transactionAuthStatus := "COMPLETE"
+	if status != "AUTHORIZED" {
+		transactionAuthStatus = "TRANSACTION-AUTH-NOT-AUTHORIZED"
+	}
+	go ts.transactionRepo.UpdateStatusTransaction(ctx, ts.transactionPayee.ID, transactionAuthStatus)
+	ts.transactionRepo.UpdateStatusTransaction(ctx, ts.transactionPayer.ID, transactionAuthStatus)
+	ts.transactionRepo.Done()
+
 	//RECEBER DADOS DTO (PAYEE PAYER VALUE)
-	//CHECK-OPERATION
 	//SAVE TRANSACTION PAYER
-	// SAVE TRANSACTION PAYEE
+	//SAVE TRANSACTION PAYEE
+	//CHECK-OPERATION
+	//UPDATE TRANSACTION PAYER
+	//UPDATE TRANSACTION PAYEE
 	//NOTIFY EMAIL
 	return
 }
@@ -83,14 +91,15 @@ func (ts *TransactionService) executeTransactionPayer(ctx context.Context) (list
 			Operation: transactionsPayer[index].Operation,
 		})
 	}
-	ts.transactionPayee.TransactionFactory(
-		payer.TypeUser, ts.input.Value, true, transactions,
+	ts.transactionPayer.TransactionFactory(
+		payer.ID, payer.TypeUser, ts.input.Value, true, transactions,
 	)
-	list_errors = ts.transactionPayee.Transaction()
+	list_errors = ts.transactionPayer.Transaction()
 	if len(list_errors) != 0 {
 		return
 	}
-	err = ts.transactionRepo.InsertTransaction(ctx, *ts.transactionPayee)
+	time.Sleep(time.Millisecond * time.Duration(ts.input.Sleep))
+	err = ts.transactionRepo.InsertTransaction(ctx, ts.transactionPayer.Get())
 	if err != nil {
 		list_errors = append(list_errors, err)
 		return
@@ -120,16 +129,28 @@ func (ts *TransactionService) executeTransactionPayee(ctx context.Context) (list
 		})
 	}
 	ts.transactionPayee.TransactionFactory(
-		payee.TypeUser, ts.input.Value, false, transactions,
+		payee.ID, payee.TypeUser, ts.input.Value, false, transactions,
 	)
 	list_errors = ts.transactionPayee.Transaction()
 	if len(list_errors) != 0 {
 		return
 	}
-	err = ts.transactionRepo.InsertTransaction(ctx, *ts.transactionPayer)
+	time.Sleep(time.Millisecond * time.Duration(ts.input.Sleep))
+	transaction := ts.transactionPayee.Get()
+	err = ts.transactionRepo.InsertTransaction(ctx, transaction)
 	if err != nil {
 		list_errors = append(list_errors, err)
 		return
+	}
+	status := ts.checkOperation.TransactionAuth()
+	if status != "AUTHORIZED" {
+		err := ts.transactionRepo.UpdateStatusTransaction(ctx, transaction.ID, status)
+		list_errors = append(list_errors, err)
+		return
+	}
+	err = ts.transactionRepo.UpdateStatusTransaction(ctx, transaction.ID, "COMPLETE")
+	if err != nil {
+		list_errors = append(list_errors, err)
 	}
 	return
 }
