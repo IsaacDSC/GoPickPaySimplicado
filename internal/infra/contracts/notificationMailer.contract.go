@@ -1,4 +1,5 @@
 package contracts
 
-// TODO: Implementar
-type NotificationMailerInterface interface{}
+type NotificationMailerInterface interface {
+	SentMailer(mailer string) (err error)
+}

@@ -5,6 +5,8 @@
 package mocks
 
 import (
+	reflect "reflect"
+
 	gomock "github.com/golang/mock/gomock"
 )
 
@@ -29,4 +31,18 @@ func NewMockNotificationMailerInterface(ctrl *gomock.Controller) *MockNotificati
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockNotificationMailerInterface) EXPECT() *MockNotificationMailerInterfaceMockRecorder {
 	return m.recorder
+}
+
+// SentMailer mocks base method.
+func (m *MockNotificationMailerInterface) SentMailer(mailer string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SentMailer", mailer)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SentMailer indicates an expected call of SentMailer.
+func (mr *MockNotificationMailerInterfaceMockRecorder) SentMailer(mailer interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SentMailer", reflect.TypeOf((*MockNotificationMailerInterface)(nil).SentMailer), mailer)
 }
