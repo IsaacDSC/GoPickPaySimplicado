@@ -39,7 +39,7 @@ func (q *Queries) CreateTransaction(ctx context.Context, arg CreateTransactionPa
 }
 
 const getTransactionByUserID = `-- name: GetTransactionByUserID :many
-SELECT transaction.id, transaction.user_id, transaction.value, transaction.operation, transaction.status, transaction.created_at, transaction.updated_at, "user".type_user 
+SELECT transaction.id, transaction.user_id, transaction.value, transaction.operation, transaction.status, transaction.updated_at, transaction.created_at, "user".type_user 
 FROM "transaction" join "user" on "transaction".user_id = "user".id
 WHERE "user".id = $1
 `
@@ -50,8 +50,8 @@ type GetTransactionByUserIDRow struct {
 	Value     string
 	Operation sql.NullString
 	Status    string
-	CreatedAt sql.NullTime
 	UpdatedAt sql.NullTime
+	CreatedAt sql.NullTime
 	TypeUser  string
 }
 
@@ -70,8 +70,8 @@ func (q *Queries) GetTransactionByUserID(ctx context.Context, id uuid.UUID) ([]G
 			&i.Value,
 			&i.Operation,
 			&i.Status,
-			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.CreatedAt,
 			&i.TypeUser,
 		); err != nil {
 			return nil, err
@@ -85,4 +85,18 @@ func (q *Queries) GetTransactionByUserID(ctx context.Context, id uuid.UUID) ([]G
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateStatusTransaction = `-- name: UpdateStatusTransaction :exec
+UPDATE "transaction" SET status = $1 WHERE id = $2
+`
+
+type UpdateStatusTransactionParams struct {
+	Status string
+	ID     uuid.UUID
+}
+
+func (q *Queries) UpdateStatusTransaction(ctx context.Context, arg UpdateStatusTransactionParams) error {
+	_, err := q.db.ExecContext(ctx, updateStatusTransaction, arg.Status, arg.ID)
+	return err
 }

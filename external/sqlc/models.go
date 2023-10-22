@@ -16,8 +16,8 @@ type Transaction struct {
 	Value     string
 	Operation sql.NullString
 	Status    string
-	CreatedAt sql.NullTime
 	UpdatedAt sql.NullTime
+	CreatedAt sql.NullTime
 }
 
 type User struct {
@@ -27,6 +27,6 @@ type User struct {
 	TypeUser     string
 	Email        string
 	Password     sql.NullString
-	CreatedAt    sql.NullTime
 	UpdatedAt    sql.NullTime
+	CreatedAt    sql.NullTime
 }

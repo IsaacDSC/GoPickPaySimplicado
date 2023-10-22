@@ -36,6 +36,18 @@ func (m *MockTransactionRepositoriesInterface) EXPECT() *MockTransactionReposito
 	return m.recorder
 }
 
+// Done mocks base method.
+func (m *MockTransactionRepositoriesInterface) Done() {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "Done")
+}
+
+// Done indicates an expected call of Done.
+func (mr *MockTransactionRepositoriesInterfaceMockRecorder) Done() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Done", reflect.TypeOf((*MockTransactionRepositoriesInterface)(nil).Done))
+}
+
 // GetTransactionsByUserID mocks base method.
 func (m *MockTransactionRepositoriesInterface) GetTransactionsByUserID(ctx context.Context, UserID uuid.UUID) ([]domain.Transactions, error) {
 	m.ctrl.T.Helper()
@@ -63,4 +75,30 @@ func (m *MockTransactionRepositoriesInterface) InsertTransaction(ctx context.Con
 func (mr *MockTransactionRepositoriesInterfaceMockRecorder) InsertTransaction(ctx, input interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertTransaction", reflect.TypeOf((*MockTransactionRepositoriesInterface)(nil).InsertTransaction), ctx, input)
+}
+
+// Rollback mocks base method.
+func (m *MockTransactionRepositoriesInterface) Rollback() {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "Rollback")
+}
+
+// Rollback indicates an expected call of Rollback.
+func (mr *MockTransactionRepositoriesInterfaceMockRecorder) Rollback() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Rollback", reflect.TypeOf((*MockTransactionRepositoriesInterface)(nil).Rollback))
+}
+
+// UpdateStatusTransaction mocks base method.
+func (m *MockTransactionRepositoriesInterface) UpdateStatusTransaction(ctx context.Context, transactionID uuid.UUID, status string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateStatusTransaction", ctx, transactionID, status)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateStatusTransaction indicates an expected call of UpdateStatusTransaction.
+func (mr *MockTransactionRepositoriesInterfaceMockRecorder) UpdateStatusTransaction(ctx, transactionID, status interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateStatusTransaction", reflect.TypeOf((*MockTransactionRepositoriesInterface)(nil).UpdateStatusTransaction), ctx, transactionID, status)
 }

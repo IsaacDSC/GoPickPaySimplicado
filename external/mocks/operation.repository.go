@@ -5,6 +5,8 @@
 package mocks
 
 import (
+	reflect "reflect"
+
 	gomock "github.com/golang/mock/gomock"
 )
 
@@ -29,4 +31,18 @@ func NewMockOperationTransactionGatewayInterface(ctrl *gomock.Controller) *MockO
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockOperationTransactionGatewayInterface) EXPECT() *MockOperationTransactionGatewayInterfaceMockRecorder {
 	return m.recorder
+}
+
+// TransactionAuth mocks base method.
+func (m *MockOperationTransactionGatewayInterface) TransactionAuth() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "TransactionAuth")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// TransactionAuth indicates an expected call of TransactionAuth.
+func (mr *MockOperationTransactionGatewayInterfaceMockRecorder) TransactionAuth() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TransactionAuth", reflect.TypeOf((*MockOperationTransactionGatewayInterface)(nil).TransactionAuth))
 }

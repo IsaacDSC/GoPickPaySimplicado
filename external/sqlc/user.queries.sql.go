@@ -12,7 +12,7 @@ import (
 )
 
 const findAllUsers = `-- name: FindAllUsers :many
-SELECT id, complete_name, cpf_cnpj, type_user, email, password, created_at, updated_at FROM "user"
+SELECT id, complete_name, cpf_cnpj, type_user, email, password, updated_at, created_at FROM "user"
 `
 
 func (q *Queries) FindAllUsers(ctx context.Context) ([]User, error) {
@@ -31,8 +31,8 @@ func (q *Queries) FindAllUsers(ctx context.Context) ([]User, error) {
 			&i.TypeUser,
 			&i.Email,
 			&i.Password,
-			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.CreatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -48,7 +48,7 @@ func (q *Queries) FindAllUsers(ctx context.Context) ([]User, error) {
 }
 
 const getUserByID = `-- name: GetUserByID :one
-SELECT id, complete_name, cpf_cnpj, type_user, email, password, created_at, updated_at FROM "user" WHERE id = $1
+SELECT id, complete_name, cpf_cnpj, type_user, email, password, updated_at, created_at FROM "user" WHERE id = $1
 `
 
 func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
@@ -61,8 +61,8 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 		&i.TypeUser,
 		&i.Email,
 		&i.Password,
-		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.CreatedAt,
 	)
 	return i, err
 }
