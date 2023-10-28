@@ -1,6 +1,7 @@
 package queue
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/IsaacDSC/GoPickPaySimplicado/external/configs/queue/handler"
@@ -18,7 +19,9 @@ func Consumer() {
 		handler.HandlerNotificationTransactionEmail,
 	)
 
+	fmt.Println("[ * ] started consumer task")
 	if err := worker.Run(mux); err != nil {
 		log.Fatal(err)
 	}
+
 }
