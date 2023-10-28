@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/IsaacDSC/GoPickPaySimplicado/external/configs/queue"
 	"github.com/IsaacDSC/GoPickPaySimplicado/internal/domain"
 	"github.com/IsaacDSC/GoPickPaySimplicado/internal/infra/contracts"
 	"github.com/IsaacDSC/GoPickPaySimplicado/internal/shared/dto"
@@ -14,7 +15,7 @@ type TransactionService struct {
 	userRepo         contracts.UserRepositoryInterface
 	transactionRepo  contracts.TransactionRepositoriesInterface
 	checkOperation   contracts.OperationTransactionGatewayInterface
-	notification     contracts.NotificationMailerInterface
+	notification     queue.IProducerQueue
 	transactionPayer *domain.TransactionEntity //TODO: implementar contratos
 	transactionPayee *domain.TransactionEntity //TODO: implementar contratos
 	input            dto.TransactionDtoInput
@@ -24,7 +25,7 @@ func NewTransactionService(
 	userRepo contracts.UserRepositoryInterface,
 	transactionRepo contracts.TransactionRepositoriesInterface,
 	checkOperation contracts.OperationTransactionGatewayInterface,
-	notification contracts.NotificationMailerInterface,
+	notification queue.IProducerQueue,
 	transactionPayer *domain.TransactionEntity,
 	transactionPayee *domain.TransactionEntity,
 ) *TransactionService {
@@ -42,11 +43,11 @@ func NewTransactionService(
 func (ts *TransactionService) Transfer(ctx context.Context, input dto.TransactionDtoInput) (list_errors []error) {
 	defer ts.transactionRepo.Rollback()
 	ts.input = input
-	list_errors = ts.executeTransactionPayee(ctx)
+	payeeMailer, list_errors := ts.executeTransactionPayee(ctx)
 	if len(list_errors) != 0 {
 		return
 	}
-	list_errors = ts.executeTransactionPayer(ctx)
+	payerMailer, list_errors := ts.executeTransactionPayer(ctx)
 	if len(list_errors) != 0 {
 		return
 	}
@@ -59,6 +60,8 @@ func (ts *TransactionService) Transfer(ctx context.Context, input dto.Transactio
 	go ts.transactionRepo.UpdateStatusTransaction(ctx, ts.transactionPayee.ID, transactionAuthStatus)
 	ts.transactionRepo.UpdateStatusTransaction(ctx, ts.transactionPayer.ID, transactionAuthStatus)
 	ts.transactionRepo.Done()
+	go ts.notification.TransactionNotificationMailer(ts.transactionPayee.ID, ts.transactionPayee.Operation, payeeMailer)
+	go ts.notification.TransactionNotificationMailer(ts.transactionPayer.ID, ts.transactionPayer.Operation, payerMailer)
 
 	//RECEBER DADOS DTO (PAYEE PAYER VALUE)
 	//SAVE TRANSACTION PAYER
@@ -70,7 +73,7 @@ func (ts *TransactionService) Transfer(ctx context.Context, input dto.Transactio
 	return
 }
 
-func (ts *TransactionService) executeTransactionPayer(ctx context.Context) (list_errors []error) {
+func (ts *TransactionService) executeTransactionPayer(ctx context.Context) (mailer string, list_errors []error) {
 	payer, err := ts.userRepo.GetUserByID(ctx, ts.input.PayerID)
 	if err != nil {
 		list_errors = append(list_errors, err)
@@ -104,15 +107,17 @@ func (ts *TransactionService) executeTransactionPayer(ctx context.Context) (list
 		list_errors = append(list_errors, err)
 		return
 	}
+	mailer = payer.Email
 	return
 }
 
-func (ts *TransactionService) executeTransactionPayee(ctx context.Context) (list_errors []error) {
+func (ts *TransactionService) executeTransactionPayee(ctx context.Context) (mailer string, list_errors []error) {
 	payee, err := ts.userRepo.GetUserByID(ctx, ts.input.PayeeID)
 	if err != nil {
 		list_errors = append(list_errors, err)
 		return
 	}
+
 	transactionsPayee, err := ts.transactionRepo.GetTransactionsByUserID(ctx, payee.ID)
 	if err != nil {
 		list_errors = append(list_errors, err)
@@ -152,5 +157,6 @@ func (ts *TransactionService) executeTransactionPayee(ctx context.Context) (list
 	if err != nil {
 		list_errors = append(list_errors, err)
 	}
+	mailer = payee.Email
 	return
 }

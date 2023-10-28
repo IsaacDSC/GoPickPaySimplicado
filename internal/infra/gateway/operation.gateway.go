@@ -10,6 +10,10 @@ import (
 
 type OperationTransactionGateway struct{}
 
+func NewOperationTransactionGateway() *OperationTransactionGateway {
+	return new(OperationTransactionGateway)
+}
+
 func (*OperationTransactionGateway) TransactionAuth() string {
 	url := "https://run.mocky.io/v3/052ea2d9-e51c-4fcf-bcd7-db3ceb4395f6"
 	req, _ := http.NewRequest("GET", url, nil)

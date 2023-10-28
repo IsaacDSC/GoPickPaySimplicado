@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"strings"
 	"testing"
 
 	"github.com/IsaacDSC/GoPickPaySimplicado/external/mocks"
@@ -20,6 +21,7 @@ func TestTransactionService(t *testing.T) {
 				defer ctl.Finish()
 				userRepository := mocks.NewMockUserRepositoryInterface(ctl)
 				transactionAuthGateway := mocks.NewMockOperationTransactionGatewayInterface(ctl)
+				producer := mocks.NewMockIProducerQueue(ctl)
 				userID := uuid.New()
 				userRepository.EXPECT().GetUserByID(gomock.Any(), gomock.Any()).Return(
 					domain.UserEntity{
@@ -53,7 +55,7 @@ func TestTransactionService(t *testing.T) {
 				service := NewTransactionService(
 					userRepository, transactionRepository,
 					transactionAuthGateway,
-					mocks.NewMockNotificationMailerInterface,
+					producer,
 					domain.NewTransactionEntity(domain.NewWalletEntity()),
 					domain.NewTransactionEntity(domain.NewWalletEntity()),
 				)
@@ -61,9 +63,10 @@ func TestTransactionService(t *testing.T) {
 					Value:   "10000000",
 					PayerID: userID,
 				}
-				list_errors := service.executeTransactionPayer(context.Background())
+				payerMailer, list_errors := service.executeTransactionPayer(context.Background())
 				for index := range list_errors {
 					assert.NoError(t, list_errors[index])
+					assert.True(t, strings.Contains(payerMailer, "@"))
 				}
 			})
 		})
@@ -76,6 +79,7 @@ func TestTransactionService(t *testing.T) {
 				defer ctl.Finish()
 				userRepository := mocks.NewMockUserRepositoryInterface(ctl)
 				transactionAuthGateway := mocks.NewMockOperationTransactionGatewayInterface(ctl)
+				producer := mocks.NewMockIProducerQueue(ctl)
 				userID := uuid.New()
 				userRepository.EXPECT().GetUserByID(gomock.Any(), gomock.Any()).Return(
 					domain.UserEntity{
@@ -109,7 +113,7 @@ func TestTransactionService(t *testing.T) {
 				service := NewTransactionService(
 					userRepository, transactionRepository,
 					transactionAuthGateway,
-					mocks.NewMockNotificationMailerInterface,
+					producer,
 					domain.NewTransactionEntity(domain.NewWalletEntity()),
 					domain.NewTransactionEntity(domain.NewWalletEntity()),
 				)
@@ -117,9 +121,10 @@ func TestTransactionService(t *testing.T) {
 					Value:   "10000000",
 					PayerID: userID,
 				}
-				list_errors := service.executeTransactionPayee(context.Background())
+				payeeMailer, list_errors := service.executeTransactionPayee(context.Background())
 				for index := range list_errors {
 					assert.NoError(t, list_errors[index])
+					assert.True(t, strings.Contains(payeeMailer, "@"))
 				}
 			})
 		})
