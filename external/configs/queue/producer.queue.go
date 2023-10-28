@@ -9,6 +9,10 @@ import (
 	"github.com/hibiken/asynq"
 )
 
+type IProducerQueue interface {
+	TransactionNotificationMailer(transactionID uuid.UUID, operation string, mailer string)
+}
+
 type ProducerQueue struct {
 	client *asynq.Client
 }
@@ -20,11 +24,11 @@ func NewProducerQueue(client *asynq.Client) *ProducerQueue {
 }
 
 func (pq *ProducerQueue) TransactionNotificationMailer(
-	transactionID uuid.UUID, mailer string,
+	transactionID uuid.UUID, operation string, mailer string,
 ) {
 	delay := 1 * time.Minute
 	taskNotificationMailer := task.NewNotificationTransactionEmailTask(
-		transactionID, mailer, time.Now().Add(delay),
+		transactionID, mailer, operation, time.Now().Add(delay),
 	)
 
 	if _, err := pq.client.Enqueue(

@@ -16,7 +16,7 @@ const (
 )
 
 func NewNotificationTransactionEmailTask(
-	transactionID uuid.UUID, mailer string, sentIn time.Time,
+	transactionID uuid.UUID, mailer, operation string, sentIn time.Time,
 ) *asynq.Task {
 	payload := map[string]interface{}{
 		"transaction_id": transactionID,
