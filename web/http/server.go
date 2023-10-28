@@ -13,6 +13,7 @@ func StartServerHttp() {
 	router.Use(middleware.Logger)
 	router.Use(middleware.Recoverer)
 	StartRoutes(router)
-	fmt.Println("[ * ] start application 3000")
+	fmt.Println("[ * ] started application 3000")
+	fmt.Println("[ * ] http://localhost:3000/")
 	http.ListenAndServe(":3000", router)
 }
