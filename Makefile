@@ -7,6 +7,7 @@ GOGET=$(GO) get
 CMD_MAIN = ./cmd/main.go
 START = $(GO) run $(CMD_MAIN)
 INFRA_CONTRACTS = ./internal/infra/contracts
+EXTERNAL_CONTRACTS = ./external
 MOCKS = ./external/mocks
 
 # Output binary name
@@ -38,6 +39,7 @@ generate-mocks:
 	mockgen -source=$(INFRA_CONTRACTS)/user.contract.go -destination=$(MOCKS)/user.repository.go -package=mocks
 	mockgen -source=$(INFRA_CONTRACTS)/operation.contract.go -destination=$(MOCKS)/operation.repository.go -package=mocks
 	mockgen -source=$(INFRA_CONTRACTS)/notificationMailer.contract.go -destination=$(MOCKS)/notificationMailer.repository.go -package=mocks
+	mockgen -source=$(EXTERNAL_CONTRACTS)/configs/queue/producer.queue.go -destination=$(MOCKS)/producer.queue.go -package=mocks
 
 
 
