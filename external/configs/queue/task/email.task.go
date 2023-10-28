@@ -21,6 +21,7 @@ func NewNotificationTransactionEmailTask(
 	payload := map[string]interface{}{
 		"transaction_id": transactionID,
 		"mailer":         mailer,
+		"operation":      operation,
 		"sent_in":        sentIn.String(),
 	}
 	input, err := json.Marshal(payload)
