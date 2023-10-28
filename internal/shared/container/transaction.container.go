@@ -1,6 +1,7 @@
 package container
 
 import (
+	"github.com/IsaacDSC/GoPickPaySimplicado/external/configs/queue"
 	"github.com/IsaacDSC/GoPickPaySimplicado/internal/domain"
 	"github.com/IsaacDSC/GoPickPaySimplicado/internal/infra/gateway"
 	"github.com/IsaacDSC/GoPickPaySimplicado/internal/infra/repositories"
@@ -11,8 +12,8 @@ func NewTransactionContainer() service.TransactionServiceInterface {
 	return service.NewTransactionService(
 		repositories.NewUserRepository(),
 		repositories.NewTransactionRepositories(),
-		&gateway.OperationTransactionGateway{},
-		&gateway.NotificationMailer{},
+		gateway.NewOperationTransactionGateway(),
+		queue.NewProducerQueue(queue.AsyncClientConn()),
 		domain.NewTransactionEntity(domain.NewWalletEntity()),
 		domain.NewTransactionEntity(domain.NewWalletEntity()),
 	)
