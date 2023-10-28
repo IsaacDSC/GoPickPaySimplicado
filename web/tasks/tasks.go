@@ -17,5 +17,6 @@ func StartServerTasks() {
 
 	http.Handle(h.RootPath()+"/", h)
 	fmt.Println("[ * ] started task 8080")
+	fmt.Println("[ * ] http://localhost:8080/monitoring/")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
