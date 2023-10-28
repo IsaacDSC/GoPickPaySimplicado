@@ -2,7 +2,7 @@ package service
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"time"
 
 	"github.com/IsaacDSC/GoPickPaySimplicado/external/configs/queue"
@@ -52,7 +52,6 @@ func (ts *TransactionService) Transfer(ctx context.Context, input dto.Transactio
 		return
 	}
 	status := ts.checkOperation.TransactionAuth()
-	fmt.Println("status", status)
 	transactionAuthStatus := "COMPLETE"
 	if status != "AUTHORIZED" {
 		transactionAuthStatus = "TRANSACTION-AUTH-NOT-AUTHORIZED"
@@ -77,6 +76,10 @@ func (ts *TransactionService) executeTransactionPayer(ctx context.Context) (mail
 	payer, err := ts.userRepo.GetUserByID(ctx, ts.input.PayerID)
 	if err != nil {
 		list_errors = append(list_errors, err)
+		return
+	}
+	if payer.TypeUser == "STOREKEEPER" {
+		list_errors = append(list_errors, errors.New("NOT-AUTHORIZED-STOREKEEPER-PAYER-TO-CONSUMER"))
 		return
 	}
 	transactionsPayer, err := ts.transactionRepo.GetTransactionsByUserID(ctx, payer.ID)
@@ -117,7 +120,6 @@ func (ts *TransactionService) executeTransactionPayee(ctx context.Context) (mail
 		list_errors = append(list_errors, err)
 		return
 	}
-
 	transactionsPayee, err := ts.transactionRepo.GetTransactionsByUserID(ctx, payee.ID)
 	if err != nil {
 		list_errors = append(list_errors, err)
@@ -146,16 +148,6 @@ func (ts *TransactionService) executeTransactionPayee(ctx context.Context) (mail
 	if err != nil {
 		list_errors = append(list_errors, err)
 		return
-	}
-	status := ts.checkOperation.TransactionAuth()
-	if status != "AUTHORIZED" {
-		err := ts.transactionRepo.UpdateStatusTransaction(ctx, transaction.ID, status)
-		list_errors = append(list_errors, err)
-		return
-	}
-	err = ts.transactionRepo.UpdateStatusTransaction(ctx, transaction.ID, "COMPLETE")
-	if err != nil {
-		list_errors = append(list_errors, err)
 	}
 	mailer = payee.Email
 	return
